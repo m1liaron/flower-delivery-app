@@ -1,0 +1,9 @@
+{
+  "name": "flower-delivery-app",
+  "scripts": {
+    "check": "npx @biomejs/biome check --write frontend backend"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.3"
+  }
+}
