@@ -1,73 +1,78 @@
-import { useState } from "react";
-import { Container, Row, Col, Button, ListGroup } from "react-bootstrap";
-import {
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
-  IconButton,
-} from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-
-const shops = ["Flowery Fragrant", "Bloomwell", "etc..", "etc..", "etc.."];
+import {
+	Card,
+	CardActions,
+	CardContent,
+	IconButton,
+	Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import { Button, Col, Container, ListGroup, Row } from "react-bootstrap";
+import type { Shop } from "../../common/types";
+import { axiosInstance } from "../../helpers/axiosInstance";
 
 const products = [
-  { id: 1, name: "Rose" },
-  { id: 2, name: "Tulip" },
-  { id: 3, name: "Lily" },
-  { id: 4, name: "Rose" },
+	{ id: 1, name: "Rose" },
+	{ id: 2, name: "Tulip" },
+	{ id: 3, name: "Lily" },
+	{ id: 4, name: "Rose" },
 ];
 
-const HomePage =  () => {
-  const [selectedShop, setSelectedShop] = useState(shops[0]);
+const HomePage = () => {
+	const [shops, setShops] = useState([]);
+	const [selectedShop, setSelectedShop] = useState<Shop>(shops[0]);
 
-  return (
-	<Container fluid>
-	  <Row className="mt-3">
-		{/* Sidebar Shops */}
-		<Col md={2}>
-		  <h6>Shops:</h6>
-		  <ListGroup>
-			{shops.map((shop, idx) => (
-			  <ListGroup.Item
-				key={`${shop}-${idx}`}
-				action
-				active={shop === selectedShop}
-				onClick={() => setSelectedShop(shop)}
-			  >
-				{shop}
-			  </ListGroup.Item>
-			))}
-		  </ListGroup>
-		</Col>
+	useEffect(() => {
+		const fetchShops = async () => {
+			const res = await axiosInstance.get("/shops");
+			setShops(res.data);
+		};
 
-		{/* Products Grid */}
-		<Col md={10}>
-		  <Row>
-			{products.map((product) => (
-			  <Col md={3} key={product.id} className="mb-3">
-				<Card variant="outlined">
-				  <CardContent className="text-center">
-					<IconButton>
-					  <FavoriteBorderIcon />
-					</IconButton>
-					<Typography variant="h6">{product.name}</Typography>
-				  </CardContent>
-				  <CardActions className="justify-content-center">
-					<Button
-					  variant="outline-primary"
-					>
-					  Add to Cart
-					</Button>
-				  </CardActions>
-				</Card>
-			  </Col>
-			))}
-		  </Row>
-		</Col>
-	  </Row>
-	</Container>
-  );
-}
+		fetchShops();
+	}, []);
+
+	return (
+		<Container fluid>
+			<Row className="mt-3">
+				<Col md={2}>
+					<h6>Shops:</h6>
+					<ListGroup>
+						{shops.map((shop: Shop, idx) => (
+							<ListGroup.Item
+								key={`${shop._id}-${idx}`}
+								action
+								active={shop === selectedShop}
+								onClick={() => setSelectedShop(shop)}
+							>
+								{shop.title}
+							</ListGroup.Item>
+						))}
+					</ListGroup>
+				</Col>
+
+				{/* Products Grid */}
+				<Col md={10}>
+					<Row>
+						{products.map((product) => (
+							<Col md={3} key={product.id} className="mb-3">
+								<Card variant="outlined">
+									<CardContent className="text-center">
+										<IconButton>
+											<FavoriteBorderIcon />
+										</IconButton>
+										<Typography variant="h6">{product.name}</Typography>
+									</CardContent>
+									<CardActions className="justify-content-center">
+										<Button variant="outline-primary">Add to Cart</Button>
+									</CardActions>
+								</Card>
+							</Col>
+						))}
+					</Row>
+				</Col>
+			</Row>
+		</Container>
+	);
+};
 
 export { HomePage };

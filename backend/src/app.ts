@@ -1,15 +1,24 @@
 import cors from "cors";
+import { config } from "dotenv";
 import express from "express";
+import { connectMongoDB } from "./db/mongodb.js";
+import { flowerRoute, shopRoute } from "./routes/index.js";
+
+config();
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 
+app.use("/shops", shopRoute);
+app.use("/flowers", flowerRoute);
+
 const port = process.env.PORT || 3000;
 
 const start = async () => {
 	try {
+		await connectMongoDB(process.env.MONGO_URI!);
 		app.listen(port, () => {
 			console.log(`HTTPS server running on port https://localhost:${port}`);
 		});
