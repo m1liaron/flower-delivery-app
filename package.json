@@ -1,9 +1,16 @@
 {
-  "name": "flower-delivery-app",
-  "scripts": {
-    "check": "npx @biomejs/biome check --write frontend backend"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.2.3"
-  }
+	"lint-staged": {
+		"*.{js,ts,jsx,tsx,json,css,md}": [
+			"biome check --write"
+		]
+	},
+	"scripts": {
+		"check": "npx @biomejs/biome check --write .",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.3",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.1.6"
+	}
 }
