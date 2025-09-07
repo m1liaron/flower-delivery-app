@@ -16,10 +16,13 @@ const getFlowers = async (req: Request, res: Response) => {
 
 const createFlower = async (req: Request, res: Response) => {
 	try {
-		const { shopId } = req.params;
-		const shops = await Flower.find({ shopId });
+		const {
+			params: { shopId },
+			body: { title, count },
+		} = req;
+		const newShop = await Flower.create({ title, count, shopId });
 
-		res.status(StatusCodes.OK).json(shops);
+		res.status(StatusCodes.OK).json(newShop);
 	} catch (err) {
 		throwServerError(res, err);
 	}

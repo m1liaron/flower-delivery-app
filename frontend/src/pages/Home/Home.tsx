@@ -8,28 +8,32 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, ListGroup, Row } from "react-bootstrap";
-import type { Shop } from "../../common/types";
+import type { Flower, Shop } from "../../common/types";
 import { axiosInstance } from "../../helpers/axiosInstance";
 
-const products = [
-	{ id: 1, name: "Rose" },
-	{ id: 2, name: "Tulip" },
-	{ id: 3, name: "Lily" },
-	{ id: 4, name: "Rose" },
-];
-
 const HomePage = () => {
-	const [shops, setShops] = useState([]);
+	const [shops, setShops] = useState<Shop[]>([]);
+	const [products, setProducts] = useState<Flower[]>([]);
 	const [selectedShop, setSelectedShop] = useState<Shop>(shops[0]);
 
 	useEffect(() => {
 		const fetchShops = async () => {
 			const res = await axiosInstance.get("/shops");
 			setShops(res.data);
+			setSelectedShop(res.data[0]);
 		};
 
 		fetchShops();
 	}, []);
+
+	useEffect(() => {
+		const fetchProducts = async () => {
+			const res = await axiosInstance.get(`/flowers/${selectedShop._id}`);
+			setProducts(res.data);
+		};
+
+		fetchProducts();
+	}, [selectedShop]);
 
 	return (
 		<Container fluid>
@@ -53,14 +57,14 @@ const HomePage = () => {
 				{/* Products Grid */}
 				<Col md={10}>
 					<Row>
-						{products.map((product) => (
-							<Col md={3} key={product.id} className="mb-3">
+						{products.map((product: Flower) => (
+							<Col md={3} key={product._id} className="mb-3">
 								<Card variant="outlined">
 									<CardContent className="text-center">
 										<IconButton>
 											<FavoriteBorderIcon />
 										</IconButton>
-										<Typography variant="h6">{product.name}</Typography>
+										<Typography variant="h6">{product.title}</Typography>
 									</CardContent>
 									<CardActions className="justify-content-center">
 										<Button variant="outline-primary">Add to Cart</Button>
