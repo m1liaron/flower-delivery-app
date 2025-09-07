@@ -28,6 +28,7 @@ const HomePage = () => {
 
 	useEffect(() => {
 		const fetchProducts = async () => {
+			if (!selectedShop) return;
 			const res = await axiosInstance.get(`/flowers/${selectedShop._id}`);
 			setProducts(res.data);
 		};
@@ -57,21 +58,22 @@ const HomePage = () => {
 				{/* Products Grid */}
 				<Col md={10}>
 					<Row>
-						{products.map((product: Flower) => (
-							<Col md={3} key={product._id} className="mb-3">
-								<Card variant="outlined">
-									<CardContent className="text-center">
-										<IconButton>
-											<FavoriteBorderIcon />
-										</IconButton>
-										<Typography variant="h6">{product.title}</Typography>
-									</CardContent>
-									<CardActions className="justify-content-center">
-										<Button variant="outline-primary">Add to Cart</Button>
-									</CardActions>
-								</Card>
-							</Col>
-						))}
+						{products.length > 0 &&
+							products.map((product: Flower) => (
+								<Col md={3} key={product._id} className="mb-3">
+									<Card variant="outlined">
+										<CardContent className="text-center">
+											<IconButton>
+												<FavoriteBorderIcon />
+											</IconButton>
+											<Typography variant="h6">{product.title}</Typography>
+										</CardContent>
+										<CardActions className="justify-content-center">
+											<Button variant="outline-primary">Add to Cart</Button>
+										</CardActions>
+									</Card>
+								</Col>
+							))}
 					</Row>
 				</Col>
 			</Row>
