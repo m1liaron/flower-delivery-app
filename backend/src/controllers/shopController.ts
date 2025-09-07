@@ -13,4 +13,21 @@ const getShops = async (req: Request, res: Response) => {
 	}
 };
 
-export { getShops };
+const createShop = async (req: Request, res: Response) => {
+	try {
+		const { title } = req.body;
+		if (title.length === 0) {
+			res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ error: true, message: "Title is missing" });
+			return;
+		}
+		const newOrder = await Shop.create({ title });
+
+		res.status(StatusCodes.OK).json(newOrder);
+	} catch (err) {
+		throwServerError(res, err);
+	}
+};
+
+export { getShops, createShop };

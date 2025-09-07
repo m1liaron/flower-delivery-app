@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { getFlowers } from "../controllers/flowerController.js";
+import { createFlower, getFlowers } from "../controllers/flowerController.js";
 
 const router = Router();
 
-router.get("/", getFlowers);
+router.get("/:shopId", getFlowers);
+router.post("/:shopId", createFlower);
 
 export { router as flowerRoute };

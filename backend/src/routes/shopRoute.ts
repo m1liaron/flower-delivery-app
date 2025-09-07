@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { getShops } from "../controllers/shopController.js";
+import { createShop, getShops } from "../controllers/shopController.js";
 
 const router = Router();
 
 router.get("/", getShops);
+router.post("/", createShop);
 
 export { router as shopRoute };

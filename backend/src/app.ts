@@ -2,7 +2,7 @@ import cors from "cors";
 import { config } from "dotenv";
 import express from "express";
 import { connectMongoDB } from "./db/mongodb.js";
-import { flowerRoute, shopRoute } from "./routes/index.js";
+import { flowerRoute, orderRoute, shopRoute } from "./routes/index.js";
 
 config();
 
@@ -13,6 +13,7 @@ app.use(cors());
 
 app.use("/shops", shopRoute);
 app.use("/flowers", flowerRoute);
+app.use("/orders", orderRoute);
 
 const port = process.env.PORT || 3000;
 

@@ -1,12 +1,12 @@
-import { Navigate, Route, Routes, BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Header } from "./components/Header/Header";
 import { HomePage } from "./pages/Home/Home";
 import { ShoppingCart } from "./pages/ShoppingCart/ShoppingCart";
-import { Header } from "./components/Header/Header";
 
 function App() {
 	return (
 		<BrowserRouter>
-			<Header/>
+			<Header />
 			<Routes>
 				<Route path="/" element={<HomePage />} />
 				<Route path="/shopping_cart" element={<ShoppingCart />} />

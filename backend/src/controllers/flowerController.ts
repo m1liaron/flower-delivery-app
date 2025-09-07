@@ -5,7 +5,8 @@ import { Flower } from "../models/Flower.js";
 
 const getFlowers = async (req: Request, res: Response) => {
 	try {
-		const shops = await Flower.find();
+		const { shopId } = req.params;
+		const shops = await Flower.find({ shopId });
 
 		res.status(StatusCodes.OK).json(shops);
 	} catch (err) {
@@ -13,4 +14,15 @@ const getFlowers = async (req: Request, res: Response) => {
 	}
 };
 
-export { getFlowers };
+const createFlower = async (req: Request, res: Response) => {
+	try {
+		const { shopId } = req.params;
+		const shops = await Flower.find({ shopId });
+
+		res.status(StatusCodes.OK).json(shops);
+	} catch (err) {
+		throwServerError(res, err);
+	}
+};
+
+export { getFlowers, createFlower };
