@@ -1,8 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Header } from "./components/Header/Header";
 import { HomePage } from "./pages/Home/Home";
-import { ShoppingCart } from "./pages/ShoppingCart/ShoppingCart";
 import { OrderDetailsPage } from "./pages/OrderDetailsPage/OrderDetailsPage";
+import { ShoppingCart } from "./pages/ShoppingCart/ShoppingCart";
 
 function App() {
 	return (

@@ -5,6 +5,7 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
+import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import {
 	type Control,
@@ -12,14 +13,13 @@ import {
 	type FieldErrors,
 	useForm,
 } from "react-hook-form";
-import { getStorage, setStorage } from "../../storage/localStorage";
+import { useNavigate } from "react-router-dom";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 import { Storage_Items } from "../../common/enums";
 import type { Flower } from "../../common/types";
-import { ProductList } from "../Home/components/ProductsList";
-import { useEffect, useState } from "react";
-import { Bounce, toast, ToastContainer } from "react-toastify";
 import { axiosInstance } from "../../helpers/axiosInstance";
-import { useNavigate } from "react-router-dom";
+import { getStorage, setStorage } from "../../storage/localStorage";
+import { ProductList } from "../Home/components/ProductsList";
 
 type FormValues = {
 	name: string;
@@ -68,32 +68,31 @@ const ShoppingCart = () => {
 
 	useEffect(() => {
 		const storedCart = getStorage<Flower[]>(Storage_Items.SHOPPING_CART) ?? [];
-    	setCart(storedCart);
+		setCart(storedCart);
 	}, []);
-
 
 	const onSubmit = async (data: FormValues) => {
 		const orderData = {
 			...data,
-			total: cart.reduce((a, b) => a += b.price, 0),
+			total: cart.reduce((a, b) => a + b.price, 0),
 			date: new Date().toLocaleDateString(),
-			products: cart.map(product => {
+			products: cart.map((product) => {
 				return {
 					_id: product._id,
 					title: product.title,
-					count: product.count
-				}
-			})
-		}
+					count: product.count,
+				};
+			}),
+		};
 
 		try {
 			const res = await axiosInstance.post("/orders", orderData);
 			localStorage.clear();
 			toast.success(`Success, your order id: ${res.data._id}`);
-			navigate(`/order/${res.data._id}`)
+			navigate(`/order/${res.data._id}`);
 		} catch (error) {
 			if (error instanceof Error) {
-				console.log(error)
+				console.log(error);
 				toast.error(error.message);
 			}
 		}
@@ -112,12 +111,12 @@ const ShoppingCart = () => {
 		});
 
 		setCart(updatedCart);
-		setStorage(Storage_Items.SHOPPING_CART, updatedCart); 
+		setStorage(Storage_Items.SHOPPING_CART, updatedCart);
 	};
 
 	const removeFlowerFromCart = (id: string) => {
 		let cart = getStorage<Flower[]>(Storage_Items.SHOPPING_CART) ?? [];
-		cart = cart.filter(flower => flower._id !== id);
+		cart = cart.filter((flower) => flower._id !== id);
 		setStorage(Storage_Items.SHOPPING_CART, cart);
 		setCart(cart);
 	};
@@ -182,7 +181,7 @@ const ShoppingCart = () => {
 
 			<ProductList
 				cart={cart}
-				removeProduct={removeFlowerFromCart} 
+				removeProduct={removeFlowerFromCart}
 				onDecrease={(productId) => updateCount(productId, "dec")}
 				onIncrease={(productId) => updateCount(productId, "inc")}
 			/>

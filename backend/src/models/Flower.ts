@@ -11,7 +11,7 @@ const FlowerSchema = new mongoose.Schema({
 	},
 	price: {
 		type: Number,
-		required: true
+		required: true,
 	},
 	shopId: { type: Types.ObjectId, ref: "Shop", required: true },
 });
