@@ -12,6 +12,11 @@ import {
 	type FieldErrors,
 	useForm,
 } from "react-hook-form";
+import { getStorage, setStorage } from "../../storage/localStorage";
+import { Storage_Items } from "../../common/enums";
+import type { Flower } from "../../common/types";
+import { ProductList } from "../Home/components/ProductsList";
+import { useEffect, useState } from "react";
 
 type FormValues = {
 	name: string;
@@ -20,7 +25,6 @@ type FormValues = {
 	address: string;
 };
 
-// Reusable field generator
 const renderInput = (
 	control: Control<FormValues>,
 	errors: FieldErrors<FormValues>,
@@ -56,14 +60,44 @@ const ShoppingCart = () => {
 		handleSubmit,
 		formState: { errors },
 	} = useForm<FormValues>();
+	const [cart, setCart] = useState<Flower[]>([]);
+
+	useEffect(() => {
+		const storedCart = getStorage<Flower[]>(Storage_Items.SHOPPING_CART) ?? [];
+    	setCart(storedCart);
+	}, []);
+
 
 	const onSubmit = (data: FormValues) => {
 		console.log(data);
 	};
 
+	const updateCount = (productId: string, action: "dec" | "inc") => {
+		const updatedCart = cart.map((product: Flower) => {
+			if (product._id === productId) {
+				const newCount =
+					action === "dec"
+						? Math.max(1, product.count - 1)
+						: Math.min(product.count + 1, product.availableCount);
+				return { ...product, count: newCount };
+			}
+			return product;
+		});
+
+		setCart(updatedCart);
+		setStorage(Storage_Items.SHOPPING_CART, updatedCart); 
+	};
+
+	const removeFlowerFromCart = (id: string) => {
+		let cart = getStorage<Flower[]>(Storage_Items.SHOPPING_CART) ?? [];
+		cart = cart.filter(flower => flower._id !== id);
+		setStorage(Storage_Items.SHOPPING_CART, cart);
+		setCart(cart);
+	};
+
 	return (
-		<Container className="mt-5">
-			<Row className="justify-content-center">
+		<Container className="mt-5 d-flex">
+			<Row className="w-100">
 				<Col md={6} lg={5}>
 					<Card elevation={3} style={{ borderRadius: "16px" }}>
 						<CardContent>
@@ -106,6 +140,13 @@ const ShoppingCart = () => {
 					</Card>
 				</Col>
 			</Row>
+
+			<ProductList
+				cart={cart}
+				removeProduct={removeFlowerFromCart} 
+				onDecrease={(productId) => updateCount(productId, "dec")}
+				onIncrease={(productId) => updateCount(productId, "inc")}
+			/>
 		</Container>
 	);
 };

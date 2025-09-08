@@ -21,7 +21,7 @@ const start = async () => {
 	try {
 		await connectMongoDB(process.env.MONGO_URI!);
 		app.listen(port, () => {
-			console.log(`HTTPS server running on port https://localhost:${port}`);
+			console.log(`server running on port https://localhost:${port}`);
 		});
 	} catch (error) {
 		console.error("Error starting server: ", error);
