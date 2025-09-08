@@ -4,6 +4,7 @@ type Flower = {
 	count: number;
 	availableCount: number;
 	price: number;
+	createdAt: Date;
 };
 
 export type { Flower };

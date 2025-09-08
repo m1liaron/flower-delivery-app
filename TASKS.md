@@ -7,24 +7,24 @@ This project is divided into three levels of complexity: **Base**, **Middle**, a
 ## 🟢 Base Level
 
 ### Flower Shops Page
-- [ ] Display a list of flower shops.
-- [ ] Allow users to choose a flower shop.
-- [ ] Allow adding bouquets or single flowers to the cart (data comes from the database).
+- [x] Display a list of flower shops.
+- [x] Allow users to choose a flower shop.
+- [x] Allow adding bouquets or single flowers to the cart (data comes from the database).
 
 ### Shopping Cart Page
-- [ ] Display all added products in the cart.
-- [ ] Allow users to remove products.
-- [ ] Allow users to change product quantities.
-- [ ] Add inputs for **email**, **phone number**, and **delivery address**.
-- [ ] Save the order in the database after the user clicks **Submit**.
+- [x] Display all added products in the cart.
+- [x] Allow users to remove products.
+- [x] Allow users to change product quantities.
+- [x] Add inputs for **email**, **phone number**, and **delivery address**.
+- [x] Save the order in the database after the user clicks **Submit**.
 
 ---
 
 ## 🟡 Middle Level
 
 ### Flower Shops Page
-- [ ] ✅ Everything from the **Base Level**.
-- [ ] Add sorting by **price** and/or **date added**.
+- [x] ✅ Everything from the **Base Level**.
+- [x] Add sorting by **price** and/or **date added**.
 - [ ] Add ability to mark bouquets as **favorites**.
 - [ ] Display favorite flowers first when sorting.
 

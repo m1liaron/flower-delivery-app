@@ -1,7 +1,11 @@
 import { Button, Col, Row } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 
-const Header = () => {
+interface HeaderProps {
+  setSortBy: (type: "price" | "date" | null) => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ setSortBy }) => {
 	return (
 		<Row className="p-3 border-bottom">
 			<Col>
@@ -13,8 +17,12 @@ const Header = () => {
 			</Col>
 
 			<Col className="text-end">
-				<Button variant="link">Sort by price</Button>
-				<Button variant="link">Sort by date</Button>
+				<Button variant="link" onClick={() => setSortBy("price")}>
+				Sort by price
+				</Button>
+				<Button variant="link" onClick={() => setSortBy("date")}>
+				Sort by date
+				</Button>
 			</Col>
 		</Row>
 	);

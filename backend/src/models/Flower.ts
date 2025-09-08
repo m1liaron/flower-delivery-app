@@ -14,7 +14,7 @@ const FlowerSchema = new mongoose.Schema({
 		required: true,
 	},
 	shopId: { type: Types.ObjectId, ref: "Shop", required: true },
-});
+}, { timestamps: true });
 
 const Flower = mongoose.model("Flower", FlowerSchema);
 

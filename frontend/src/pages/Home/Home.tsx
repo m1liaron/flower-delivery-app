@@ -13,10 +13,22 @@ import type { Flower, Shop } from "../../common/types";
 import { axiosInstance } from "../../helpers/axiosInstance";
 import { getStorage, setStorage } from "../../storage/localStorage";
 
-const HomePage = () => {
+interface HomePageProps {
+  sortBy: "price" | "date" | null;
+}
+
+const HomePage: React.FC<HomePageProps> = ({ sortBy }) => {
 	const [shops, setShops] = useState<Shop[]>([]);
 	const [products, setProducts] = useState<Flower[]>([]);
 	const [selectedShop, setSelectedShop] = useState<Shop>(shops[0]);
+
+	
+	const sortedProducts = [...products].sort((a, b) => {
+		if (!sortBy) return 0;
+		if (sortBy === "price") return a.price - b.price;
+		if (sortBy === "date") return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+		return 0;
+	});
 
 	useEffect(() => {
 		const fetchShops = async () => {
@@ -84,8 +96,8 @@ const HomePage = () => {
 				{/* Products Grid */}
 				<Col md={10}>
 					<Row>
-						{products.length > 0 &&
-							products.map((product: Flower) => (
+						{sortedProducts.length > 0 &&
+							sortedProducts.map((product: Flower) => (
 								<Col md={3} key={product._id} className="mb-3">
 									<Card variant="outlined">
 										<CardContent className="text-center">
