@@ -5,9 +5,26 @@ import { Order } from "../models/Order.js";
 
 const getOrders = async (req: Request, res: Response) => {
 	try {
-		const shops = await Order.find();
+		const orders = await Order.find().populate("products");
 
-		res.status(StatusCodes.OK).json(shops);
+		res.status(StatusCodes.OK).json(orders);
+	} catch (err) {
+		throwServerError(res, err);
+	}
+};
+
+
+const getOrderDetails = async (req: Request, res: Response) => {
+	try {
+		const { id } = req.params
+		
+		const order = await Order.findById(id).populate("products");
+		if (!order) {
+			res.status(StatusCodes.NOT_FOUND).json({ error: true, message: "Order not found" });
+			return;
+		}
+
+		res.status(StatusCodes.OK).json(order);
 	} catch (err) {
 		throwServerError(res, err);
 	}
@@ -16,12 +33,14 @@ const getOrders = async (req: Request, res: Response) => {
 const createOrder = async (req: Request, res: Response) => {
 	try {
 		const { total, products, address, date } = req.body;
-		const newOrder = await Order.create({ total, products, address, date });
+		const productIds = products.map((p: any) => p._id ?? p);
 
-		res.status(StatusCodes.OK).json(newOrder);
+		const newOrder = await Order.create({ total, products: productIds, address, date });
+
+		res.status(StatusCodes.OK).json(newOrder.toObject({ getters: true }));
 	} catch (err) {
 		throwServerError(res, err);
 	}
 };
 
-export { getOrders, createOrder };
+export { getOrders, createOrder, getOrderDetails };

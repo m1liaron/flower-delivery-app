@@ -18,9 +18,9 @@ const createFlower = async (req: Request, res: Response) => {
 	try {
 		const {
 			params: { shopId },
-			body: { title, count },
+			body: { title, count, price },
 		} = req;
-		const newShop = await Flower.create({ title, count, shopId });
+		const newShop = await Flower.create({ title, count, price, shopId });
 
 		res.status(StatusCodes.OK).json(newShop);
 	} catch (err) {

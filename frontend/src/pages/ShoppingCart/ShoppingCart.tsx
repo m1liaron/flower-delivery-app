@@ -17,6 +17,9 @@ import { Storage_Items } from "../../common/enums";
 import type { Flower } from "../../common/types";
 import { ProductList } from "../Home/components/ProductsList";
 import { useEffect, useState } from "react";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import { axiosInstance } from "../../helpers/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 type FormValues = {
 	name: string;
@@ -61,6 +64,7 @@ const ShoppingCart = () => {
 		formState: { errors },
 	} = useForm<FormValues>();
 	const [cart, setCart] = useState<Flower[]>([]);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const storedCart = getStorage<Flower[]>(Storage_Items.SHOPPING_CART) ?? [];
@@ -68,8 +72,31 @@ const ShoppingCart = () => {
 	}, []);
 
 
-	const onSubmit = (data: FormValues) => {
-		console.log(data);
+	const onSubmit = async (data: FormValues) => {
+		const orderData = {
+			...data,
+			total: cart.reduce((a, b) => a += b.price, 0),
+			date: new Date().toLocaleDateString(),
+			products: cart.map(product => {
+				return {
+					_id: product._id,
+					title: product.title,
+					count: product.count
+				}
+			})
+		}
+
+		try {
+			const res = await axiosInstance.post("/orders", orderData);
+			localStorage.clear();
+			toast.success(`Success, your order id: ${res.data._id}`);
+			navigate(`/order/${res.data._id}`)
+		} catch (error) {
+			if (error instanceof Error) {
+				console.log(error)
+				toast.error(error.message);
+			}
+		}
 	};
 
 	const updateCount = (productId: string, action: "dec" | "inc") => {
@@ -97,6 +124,19 @@ const ShoppingCart = () => {
 
 	return (
 		<Container className="mt-5 d-flex">
+			<ToastContainer
+				position="top-right"
+				autoClose={5000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick={false}
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="light"
+				transition={Bounce}
+			/>
 			<Row className="w-100">
 				<Col md={6} lg={5}>
 					<Card elevation={3} style={{ borderRadius: "16px" }}>
@@ -116,7 +156,6 @@ const ShoppingCart = () => {
 								{renderInput(control, errors, "phone", "Phone", "tel", {
 									required: "Phone is required",
 									pattern: {
-										value: /^[0-9]{10,15}$/,
 										message: "Enter a valid phone number",
 									},
 								})}
