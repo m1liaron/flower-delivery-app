@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createFlower, getFlowers, updateFlower } from "../controllers/flowerController.js";
+import {
+	createFlower,
+	getFlowers,
+	updateFlower,
+} from "../controllers/flowerController.js";
 
 const router = Router();
 

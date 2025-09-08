@@ -7,32 +7,37 @@ import {
 	IconButton,
 	Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Col, Container, ListGroup, Row } from "react-bootstrap";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 import { Storage_Items } from "../../common/enums";
 import type { Flower, Shop } from "../../common/types";
 import { axiosInstance } from "../../helpers/axiosInstance";
 import { getStorage, setStorage } from "../../storage/localStorage";
-import { Bounce, toast, ToastContainer } from "react-toastify";
 
 interface HomePageProps {
-  sortBy: "price" | "date" | null;
+	sortBy: "price" | "date" | null;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ sortBy }) => {
 	const [shops, setShops] = useState<Shop[]>([]);
 	const [products, setProducts] = useState<Flower[]>([]);
 	const [selectedShop, setSelectedShop] = useState<Shop>(shops[0]);
+	const [page, setPage] = useState(1);
+	const [hasMorePages, setHasMorePages] = useState(true);
+	const [loading, setLoading] = useState(false);
 
-	
+	const observerRef = useRef<HTMLDivElement | null>(null);
+
 	const sortedProducts = [...products].sort((a, b) => {
 		if (a.favorite && !b.favorite) return -1;
 		if (!a.favorite && b.favorite) return 1;
-		
+
 		if (!sortBy) return 0;
-		
+
 		if (sortBy === "price") return a.price - b.price;
-		if (sortBy === "date") return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+		if (sortBy === "date")
+			return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
 		return 0;
 	});
 
@@ -46,15 +51,68 @@ const HomePage: React.FC<HomePageProps> = ({ sortBy }) => {
 		fetchShops();
 	}, []);
 
-	useEffect(() => {
-		const fetchProducts = async () => {
-			if (!selectedShop) return;
-			const res = await axiosInstance.get(`/flowers/${selectedShop._id}`);
-			setProducts(res.data);
-		};
+	const fetchProducts = useCallback(async () => {
+		if (!selectedShop || loading || !hasMorePages) return;
 
-		fetchProducts();
+		setLoading(true);
+		try {
+			const res = await axiosInstance.get(
+				`/flowers/${selectedShop._id}?page=${page}&limit=15`,
+			);
+			const newProducts: Flower[] = res.data.data;
+			const allPages = res.data.all_pages ?? 1;
+
+			setProducts((prev) => [...prev, ...newProducts]);
+			setHasMorePages(page < allPages);
+		} catch (error) {
+			if (error instanceof Error) {
+				toast.error(error.message);
+			}
+		} finally {
+			setLoading(false);
+		}
+	}, [selectedShop, page, hasMorePages, loading]);
+
+	useEffect(() => {
+		if (!selectedShop) return;
+		setProducts([]);
+		setPage(1);
+		setHasMorePages(true);
 	}, [selectedShop]);
+
+	useEffect(() => {
+		fetchProducts();
+	}, [selectedShop, page]);
+
+	const isBottomOfPage = () => {
+		// check is user scrolled to bottom
+		// Calculate the scroll position
+		const scrollTop =
+			(document.documentElement && document.documentElement.scrollTop) ||
+			document.body.scrollTop;
+		const scrollHeight =
+			(document.documentElement && document.documentElement.scrollHeight) ||
+			document.body.scrollHeight;
+		const clientHeight =
+			document.documentElement.clientHeight || window.innerHeight;
+
+		// Check if user has scrolled to the bottom
+		return scrollTop + clientHeight >= scrollHeight;
+	};
+
+	const addPageOnPagination = () => {
+		if (isBottomOfPage() && hasMorePages) {
+			setPage((page) => page + 1);
+		}
+	};
+
+	useEffect(() => {
+		window.addEventListener("scroll", addPageOnPagination);
+
+		return () => {
+			window.removeEventListener("scroll", addPageOnPagination);
+		};
+	}, []);
 
 	const addFlowerToCart = (newFlower: Flower) => {
 		if (newFlower.count === 0) return;
@@ -81,10 +139,8 @@ const HomePage: React.FC<HomePageProps> = ({ sortBy }) => {
 	};
 
 	const updateProduct = (id: string, favorite: boolean) => {
-		setProducts(prev =>
-			prev.map(prod =>
-				prod._id === id ? { ...prod, favorite } : prod
-			)
+		setProducts((prev) =>
+			prev.map((prod) => (prod._id === id ? { ...prod, favorite } : prod)),
 		);
 	};
 
@@ -95,7 +151,7 @@ const HomePage: React.FC<HomePageProps> = ({ sortBy }) => {
 			updateProduct(id, newFavorite);
 		} catch (error) {
 			if (error instanceof Error) {
-			toast.error(error.message);
+				toast.error(error.message);
 			}
 		}
 	};
@@ -140,7 +196,11 @@ const HomePage: React.FC<HomePageProps> = ({ sortBy }) => {
 								<Col md={3} key={product._id} className="mb-3">
 									<Card variant="outlined">
 										<CardContent className="text-center">
-											<IconButton onClick={() => favoriteProduct(product._id, product.favorite)}>
+											<IconButton
+												onClick={() =>
+													favoriteProduct(product._id, product.favorite)
+												}
+											>
 												{product.favorite ? (
 													<FavoriteIcon style={{ color: "red" }} />
 												) : (
@@ -162,6 +222,9 @@ const HomePage: React.FC<HomePageProps> = ({ sortBy }) => {
 								</Col>
 							))}
 					</Row>
+					<div ref={observerRef} style={{ height: "50px" }} />
+					{loading && <p className="text-center">Loading...</p>}
+					{!hasMorePages && <p className="text-center">No more flowers </p>}
 				</Col>
 			</Row>
 		</Container>

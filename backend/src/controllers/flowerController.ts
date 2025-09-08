@@ -5,10 +5,25 @@ import { Flower } from "../models/Flower.js";
 
 const getFlowers = async (req: Request, res: Response) => {
 	try {
-		const { shopId } = req.params;
-		const shops = await Flower.find({ shopId });
+		const {
+			params: { shopId },
+			query: { page = 1, limit = 10 },
+		} = req;
 
-		res.status(StatusCodes.OK).json(shops);
+		const pageNumber = Number(page);
+		const limitNumber = Number(limit);
+
+		const flowers = await Flower.find({ shopId })
+			.skip((pageNumber - 1) * limitNumber)
+			.limit(limitNumber);
+		const total = await Flower.countDocuments({ shopId });
+
+		res.status(StatusCodes.OK).json({
+			data: flowers,
+			page: pageNumber,
+			limit: limitNumber,
+			all_pages: Math.ceil(total / limitNumber),
+		});
 	} catch (err) {
 		throwServerError(res, err);
 	}
@@ -31,7 +46,7 @@ const createFlower = async (req: Request, res: Response) => {
 const updateFlower = async (req: Request, res: Response) => {
 	try {
 		const { flowerId } = req.params;
-		console.log(flowerId)
+		console.log(flowerId);
 		const updatedFlower = await Flower.findByIdAndUpdate(flowerId, req.body);
 		if (!updatedFlower) {
 			res
@@ -44,6 +59,6 @@ const updateFlower = async (req: Request, res: Response) => {
 	} catch (err) {
 		throwServerError(res, err);
 	}
-}
+};
 
 export { getFlowers, createFlower, updateFlower };

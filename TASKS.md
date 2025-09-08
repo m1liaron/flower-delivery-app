@@ -25,33 +25,33 @@ This project is divided into three levels of complexity: **Base**, **Middle**, a
 ### Flower Shops Page
 - [x] ✅ Everything from the **Base Level**.
 - [x] Add sorting by **price** and/or **date added**.
-- [ ] Add ability to mark bouquets as **favorites**.
-- [ ] Display favorite flowers first when sorting.
+- [x] Add ability to mark bouquets as **favorites**.
+- [x] Display favorite flowers first when sorting.
 
 ### Shopping Cart Page
-- [ ] ✅ Everything from the **Base Level**.
-- [ ] Save the cart in **local storage**.
-- [ ] When creating an order, include **date and time** adjusted to the customer’s **time zone**.
+- [x] ✅ Everything from the **Base Level**.
+- [x] Save the cart in **local storage**.
+- [x] When creating an order, include **date and time** adjusted to the customer’s **time zone**.
 
 ### Order Details Page
-- [ ] After placing an order, automatically redirect the user to an **Order Details Page**.
-- [ ] Show the following information:
-  - [ ] Unique **order ID**
-  - [ ] List of products
-  - [ ] **Total price**
-  - [ ] **Delivery address**
-  - [ ] **Date and time** (adjusted to the user’s time zone)
+- [x] After placing an order, automatically redirect the user to an **Order Details Page**.
+- [x] Show the following information:
+  - [x] Unique **order ID**
+  - [x] List of products
+  - [x] **Total price**
+  - [x] **Delivery address**
+  - [x] **Date and time** (adjusted to the user’s time zone)
 
 ---
 
 ## 🔴 Advanced Level
 
 ### Flower Shops Page
-- [ ] ✅ Everything from the **Middle Level**.
-- [ ] Add **pagination** for large flower catalogs.
+- [x] ✅ Everything from the **Middle Level**.
+- [x] Add **pagination** for large flower catalogs.
 
 ### Shopping Cart Page
-- [ ] ✅ Everything from the **Middle Level**.
+- [x] ✅ Everything from the **Middle Level**.
 
 ### Google Maps Integration
 - [ ] Add a Google Maps component.
