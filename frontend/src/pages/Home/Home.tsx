@@ -1,3 +1,4 @@
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import {
 	Card,
@@ -12,6 +13,7 @@ import { Storage_Items } from "../../common/enums";
 import type { Flower, Shop } from "../../common/types";
 import { axiosInstance } from "../../helpers/axiosInstance";
 import { getStorage, setStorage } from "../../storage/localStorage";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 
 interface HomePageProps {
   sortBy: "price" | "date" | null;
@@ -24,7 +26,11 @@ const HomePage: React.FC<HomePageProps> = ({ sortBy }) => {
 
 	
 	const sortedProducts = [...products].sort((a, b) => {
+		if (a.favorite && !b.favorite) return -1;
+		if (!a.favorite && b.favorite) return 1;
+		
 		if (!sortBy) return 0;
+		
 		if (sortBy === "price") return a.price - b.price;
 		if (sortBy === "date") return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
 		return 0;
@@ -74,8 +80,41 @@ const HomePage: React.FC<HomePageProps> = ({ sortBy }) => {
 		setStorage(Storage_Items.SHOPPING_CART, cart);
 	};
 
+	const updateProduct = (id: string, favorite: boolean) => {
+		setProducts(prev =>
+			prev.map(prod =>
+				prod._id === id ? { ...prod, favorite } : prod
+			)
+		);
+	};
+
+	const favoriteProduct = async (id: string, currentFavorite: boolean) => {
+		try {
+			const newFavorite = !currentFavorite;
+			await axiosInstance.patch(`/flowers/${id}`, { favorite: newFavorite });
+			updateProduct(id, newFavorite);
+		} catch (error) {
+			if (error instanceof Error) {
+			toast.error(error.message);
+			}
+		}
+	};
+
 	return (
 		<Container fluid>
+			<ToastContainer
+				position="top-right"
+				autoClose={5000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick={false}
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="light"
+				transition={Bounce}
+			/>
 			<Row className="mt-3">
 				<Col md={2}>
 					<h6>Shops:</h6>
@@ -101,8 +140,12 @@ const HomePage: React.FC<HomePageProps> = ({ sortBy }) => {
 								<Col md={3} key={product._id} className="mb-3">
 									<Card variant="outlined">
 										<CardContent className="text-center">
-											<IconButton>
-												<FavoriteBorderIcon />
+											<IconButton onClick={() => favoriteProduct(product._id, product.favorite)}>
+												{product.favorite ? (
+													<FavoriteIcon style={{ color: "red" }} />
+												) : (
+													<FavoriteBorderIcon />
+												)}
 											</IconButton>
 											<Typography variant="h6">{product.title}</Typography>
 											<Typography variant="h6">{product.count}</Typography>

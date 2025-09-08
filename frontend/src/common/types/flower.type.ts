@@ -4,6 +4,7 @@ type Flower = {
 	count: number;
 	availableCount: number;
 	price: number;
+	favorite: boolean;
 	createdAt: Date;
 };
 

@@ -28,4 +28,22 @@ const createFlower = async (req: Request, res: Response) => {
 	}
 };
 
-export { getFlowers, createFlower };
+const updateFlower = async (req: Request, res: Response) => {
+	try {
+		const { flowerId } = req.params;
+		console.log(flowerId)
+		const updatedFlower = await Flower.findByIdAndUpdate(flowerId, req.body);
+		if (!updatedFlower) {
+			res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ error: true, message: "Flower not found" });
+			return;
+		}
+
+		res.status(StatusCodes.OK).json(updatedFlower);
+	} catch (err) {
+		throwServerError(res, err);
+	}
+}
+
+export { getFlowers, createFlower, updateFlower };

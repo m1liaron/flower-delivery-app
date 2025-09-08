@@ -13,6 +13,11 @@ const FlowerSchema = new mongoose.Schema({
 		type: Number,
 		required: true,
 	},
+	favorite: {
+		type: Boolean,
+		required: true,
+		default: false
+	},
 	shopId: { type: Types.ObjectId, ref: "Shop", required: true },
 }, { timestamps: true });
 
