@@ -21,7 +21,7 @@ import { axiosInstance } from "../../helpers/axiosInstance";
 import { getStorage, setStorage } from "../../storage/localStorage";
 import { ProductList } from "../Home/components/ProductsList";
 import { AddressAutocomplete } from "./components/AddressAutocomplete";
-import { OSMMap } from "./components/Map";
+import DeliveryOSMMap from "./components/Map";
 
 export type FormValues = {
   name: string;
@@ -61,15 +61,17 @@ const renderInput = (
 	</div>
 );
 
+
 const ShoppingCart = () => {
 	const {
 		control,
 		handleSubmit,
 		formState: { errors },
-		setValue
+		setValue,
+		watch
 	} = useForm<FormValues>();
 	const [cart, setCart] = useState<Flower[]>([]);
-	const [mapCenter, setMapCenter] = useState({ lat: 50.4501, lng: 30.5234 });
+	const [_mapCenter, setMapCenter] = useState({ lat: 50.4501, lng: 30.5234 });
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -77,6 +79,14 @@ const ShoppingCart = () => {
 		setCart(storedCart);
 	}, []);
 
+ 	const shop = { lat: 50.4501, lng: 30.5234, name: "Flower Shop Kyiv" }; // example
+
+	const user = {
+		lat: watch("lat") ?? 0,
+		lng: watch("lng") ?? 0,
+		address: watch("address") ?? "",
+	};
+		
 	const onSubmit = async (data: FormValues) => {
 		const orderData = {
 			...data,
@@ -156,34 +166,34 @@ const ShoppingCart = () => {
 					{renderInput(control, errors, "phone", "Phone", "tel", { required: "Phone is required" })}
 
 					<Controller
-					name="address"
-					control={control}
-					rules={{ required: "Address is required" }}
-					render={({ field: { onChange, value } }) => (
-						<>
-						<AddressAutocomplete
-							value={value}
-							onChange={onChange}
-							onSelect={({ lat, lng, display_name }) => {
-								setMapCenter({ lat, lng });
-								setValue("lat", lat);
-								setValue("lng", lng);
-								setValue("address", display_name);
-								onChange(display_name);
-							}}
-						/>
-						<OSMMap
-							center={mapCenter}
-							onSelect={({ lat, lng, display_name }) => {
-								setMapCenter({ lat, lng });
-								setValue("lat", lat);
-								setValue("lng", lng);
-								setValue("address", display_name);
-								onChange(display_name);
-							}}
-						/>
-						</>
-					)}
+						name="address"
+						control={control}
+						rules={{ required: "Address is required" }}
+						render={({ field: { onChange, value } }) => (
+							<>
+							<AddressAutocomplete
+								value={value}
+								onChange={onChange}
+								onSelect={({ lat, lng, display_name }) => {
+									setMapCenter({ lat, lng });
+									setValue("lat", lat);
+									setValue("lng", lng);
+									setValue("address", display_name);
+									onChange(display_name);
+								}}
+							/>
+							<DeliveryOSMMap
+								shop={shop}
+								user={user.lat && user.lng ? user : undefined}
+								onUserSelect={({ lat, lng, address }) => {
+									setMapCenter({ lat, lng });
+									setValue("lat", lat);
+									setValue("lng", lng);
+									if (address) setValue("address", address);
+								}}
+								/>
+							</>
+						)}
 					/>
 
 					<Button fullWidth type="submit" variant="contained" color="primary" size="large" style={{ borderRadius: "12px" }}>
