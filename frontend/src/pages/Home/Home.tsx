@@ -88,10 +88,10 @@ const HomePage: React.FC<HomePageProps> = ({ sortBy }) => {
 		// check is user scrolled to bottom
 		// Calculate the scroll position
 		const scrollTop =
-			(document.documentElement && document.documentElement.scrollTop) ||
+			(document.documentElement?.scrollTop) ||
 			document.body.scrollTop;
 		const scrollHeight =
-			(document.documentElement && document.documentElement.scrollHeight) ||
+			(document.documentElement?.scrollHeight) ||
 			document.body.scrollHeight;
 		const clientHeight =
 			document.documentElement.clientHeight || window.innerHeight;

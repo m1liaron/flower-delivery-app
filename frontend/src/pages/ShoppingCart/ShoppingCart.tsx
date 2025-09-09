@@ -24,12 +24,12 @@ import { AddressAutocomplete } from "./components/AddressAutocomplete";
 import DeliveryOSMMap from "./components/Map";
 
 export type FormValues = {
-  name: string;
-  email: string;
-  phone: number;
-  address: string;
-  lat?: number;
-  lng?: number;
+	name: string;
+	email: string;
+	phone: number;
+	address: string;
+	lat?: number;
+	lng?: number;
 };
 
 const renderInput = (
@@ -61,14 +61,13 @@ const renderInput = (
 	</div>
 );
 
-
 const ShoppingCart = () => {
 	const {
 		control,
 		handleSubmit,
 		formState: { errors },
 		setValue,
-		watch
+		watch,
 	} = useForm<FormValues>();
 	const [cart, setCart] = useState<Flower[]>([]);
 	const [_mapCenter, setMapCenter] = useState({ lat: 50.4501, lng: 30.5234 });
@@ -79,14 +78,14 @@ const ShoppingCart = () => {
 		setCart(storedCart);
 	}, []);
 
- 	const shop = { lat: 50.4501, lng: 30.5234, name: "Flower Shop Kyiv" }; // example
+	const shop = { lat: 50.4501, lng: 30.5234, name: "Flower Shop Kyiv" };
 
 	const user = {
 		lat: watch("lat") ?? 0,
 		lng: watch("lng") ?? 0,
 		address: watch("address") ?? "",
 	};
-		
+
 	const onSubmit = async (data: FormValues) => {
 		const orderData = {
 			...data,
@@ -139,78 +138,92 @@ const ShoppingCart = () => {
 
 	return (
 		<Container className="mt-5">
-		<ToastContainer
-			position="top-right"
-			autoClose={5000}
-			hideProgressBar={false}
-			newestOnTop={false}
-			closeOnClick={false}
-			rtl={false}
-			pauseOnFocusLoss
-			draggable
-			pauseOnHover
-			theme="light"
-			transition={Bounce}
-		/>
-		<Row className="w-100">
-			<Col md={6} lg={5}>
-			<Card elevation={3} style={{ borderRadius: "16px" }}>
-				<CardContent>
-				<Typography variant="h5" align="center" gutterBottom>
-					🛒 Shopping Cart
-				</Typography>
+			<ToastContainer
+				position="top-right"
+				autoClose={5000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick={false}
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="light"
+				transition={Bounce}
+			/>
+			<Row className="w-100">
+				<Col md={6} lg={5}>
+					<Card elevation={3} style={{ borderRadius: "16px" }}>
+						<CardContent>
+							<Typography variant="h5" align="center" gutterBottom>
+								🛒 Shopping Cart
+							</Typography>
 
-				<form onSubmit={handleSubmit(onSubmit)}>
-					{renderInput(control, errors, "email", "Email", "email", { required: "Email is required" })}
-					{renderInput(control, errors, "name", "Name", "text", { required: "Name is required", minLength: { value: 6, message: "At least 6 characters" } })}
-					{renderInput(control, errors, "phone", "Phone", "tel", { required: "Phone is required" })}
+							<form onSubmit={handleSubmit(onSubmit)}>
+								{renderInput(control, errors, "email", "Email", "email", {
+									required: "Email is required",
+								})}
+								{renderInput(control, errors, "name", "Name", "text", {
+									required: "Name is required",
+									minLength: { value: 6, message: "At least 6 characters" },
+								})}
+								{renderInput(control, errors, "phone", "Phone", "tel", {
+									required: "Phone is required",
+								})}
 
-					<Controller
-						name="address"
-						control={control}
-						rules={{ required: "Address is required" }}
-						render={({ field: { onChange, value } }) => (
-							<>
-							<AddressAutocomplete
-								value={value}
-								onChange={onChange}
-								onSelect={({ lat, lng, display_name }) => {
-									setMapCenter({ lat, lng });
-									setValue("lat", lat);
-									setValue("lng", lng);
-									setValue("address", display_name);
-									onChange(display_name);
-								}}
-							/>
-							<DeliveryOSMMap
-								shop={shop}
-								user={user.lat && user.lng ? user : undefined}
-								onUserSelect={({ lat, lng, address }) => {
-									setMapCenter({ lat, lng });
-									setValue("lat", lat);
-									setValue("lng", lng);
-									if (address) setValue("address", address);
-								}}
+								<Controller
+									name="address"
+									control={control}
+									rules={{ required: "Address is required" }}
+									render={({ field: { onChange, value } }) => (
+										<>
+											<AddressAutocomplete
+												value={value}
+												onChange={onChange}
+												onSelect={({ lat, lng, display_name }) => {
+													setMapCenter({ lat, lng });
+													setValue("lat", lat);
+													setValue("lng", lng);
+													setValue("address", display_name);
+													onChange(display_name);
+												}}
+											/>
+											<DeliveryOSMMap
+												shop={shop}
+												user={user.lat && user.lng ? user : undefined}
+												onUserSelect={({ lat, lng, address }) => {
+													setMapCenter({ lat, lng });
+													setValue("lat", lat);
+													setValue("lng", lng);
+													if (address) setValue("address", address);
+												}}
+											/>
+										</>
+									)}
 								/>
-							</>
-						)}
-					/>
 
-					<Button fullWidth type="submit" variant="contained" color="primary" size="large" style={{ borderRadius: "12px" }}>
-					Submit
-					</Button>
-				</form>
-				</CardContent>
-			</Card>
-			</Col>
-		</Row>
+								<Button
+									fullWidth
+									type="submit"
+									variant="contained"
+									color="primary"
+									size="large"
+									style={{ borderRadius: "12px" }}
+								>
+									Submit
+								</Button>
+							</form>
+						</CardContent>
+					</Card>
+				</Col>
+			</Row>
 
-		<ProductList
-			cart={cart}
-			removeProduct={removeFlowerFromCart}
-			onDecrease={(id) => updateCount(id, "dec")}
-			onIncrease={(id) => updateCount(id, "inc")}
-		/>
+			<ProductList
+				cart={cart}
+				removeProduct={removeFlowerFromCart}
+				onDecrease={(id) => updateCount(id, "dec")}
+				onIncrease={(id) => updateCount(id, "inc")}
+			/>
 		</Container>
 	);
 };
