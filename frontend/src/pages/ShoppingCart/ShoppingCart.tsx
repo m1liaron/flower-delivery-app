@@ -20,12 +20,16 @@ import type { Flower } from "../../common/types";
 import { axiosInstance } from "../../helpers/axiosInstance";
 import { getStorage, setStorage } from "../../storage/localStorage";
 import { ProductList } from "../Home/components/ProductsList";
+import { AddressAutocomplete } from "./components/AddressAutocomplete";
+import { OSMMap } from "./components/Map";
 
-type FormValues = {
-	name: string;
-	email: string;
-	phone: number;
-	address: string;
+export type FormValues = {
+  name: string;
+  email: string;
+  phone: number;
+  address: string;
+  lat?: number;
+  lng?: number;
 };
 
 const renderInput = (
@@ -62,8 +66,10 @@ const ShoppingCart = () => {
 		control,
 		handleSubmit,
 		formState: { errors },
+		setValue
 	} = useForm<FormValues>();
 	const [cart, setCart] = useState<Flower[]>([]);
+	const [mapCenter, setMapCenter] = useState({ lat: 50.4501, lng: 30.5234 });
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -122,69 +128,79 @@ const ShoppingCart = () => {
 	};
 
 	return (
-		<Container className="mt-5 d-flex">
-			<ToastContainer
-				position="top-right"
-				autoClose={5000}
-				hideProgressBar={false}
-				newestOnTop={false}
-				closeOnClick={false}
-				rtl={false}
-				pauseOnFocusLoss
-				draggable
-				pauseOnHover
-				theme="light"
-				transition={Bounce}
-			/>
-			<Row className="w-100">
-				<Col md={6} lg={5}>
-					<Card elevation={3} style={{ borderRadius: "16px" }}>
-						<CardContent>
-							<Typography variant="h5" align="center" gutterBottom>
-								🛒 Shopping Cart Login
-							</Typography>
+		<Container className="mt-5">
+		<ToastContainer
+			position="top-right"
+			autoClose={5000}
+			hideProgressBar={false}
+			newestOnTop={false}
+			closeOnClick={false}
+			rtl={false}
+			pauseOnFocusLoss
+			draggable
+			pauseOnHover
+			theme="light"
+			transition={Bounce}
+		/>
+		<Row className="w-100">
+			<Col md={6} lg={5}>
+			<Card elevation={3} style={{ borderRadius: "16px" }}>
+				<CardContent>
+				<Typography variant="h5" align="center" gutterBottom>
+					🛒 Shopping Cart
+				</Typography>
 
-							<form onSubmit={handleSubmit(onSubmit)}>
-								{renderInput(control, errors, "email", "Email", "email", {
-									required: "Email is required",
-								})}
-								{renderInput(control, errors, "name", "Name", "text", {
-									required: "Name is required",
-									minLength: { value: 6, message: "At least 6 characters" },
-								})}
-								{renderInput(control, errors, "phone", "Phone", "tel", {
-									required: "Phone is required",
-									pattern: {
-										message: "Enter a valid phone number",
-									},
-								})}
-								{renderInput(control, errors, "address", "Address", "text", {
-									required: "Address is required",
-									minLength: { value: 10, message: "At least 10 characters" },
-								})}
+				<form onSubmit={handleSubmit(onSubmit)}>
+					{renderInput(control, errors, "email", "Email", "email", { required: "Email is required" })}
+					{renderInput(control, errors, "name", "Name", "text", { required: "Name is required", minLength: { value: 6, message: "At least 6 characters" } })}
+					{renderInput(control, errors, "phone", "Phone", "tel", { required: "Phone is required" })}
 
-								<Button
-									fullWidth
-									type="submit"
-									variant="contained"
-									color="primary"
-									size="large"
-									style={{ borderRadius: "12px" }}
-								>
-									Submit
-								</Button>
-							</form>
-						</CardContent>
-					</Card>
-				</Col>
-			</Row>
+					<Controller
+					name="address"
+					control={control}
+					rules={{ required: "Address is required" }}
+					render={({ field: { onChange, value } }) => (
+						<>
+						<AddressAutocomplete
+							value={value}
+							onChange={onChange}
+							onSelect={({ lat, lng, display_name }) => {
+								setMapCenter({ lat, lng });
+								setValue("lat", lat);
+								setValue("lng", lng);
+								setValue("address", display_name);
+								onChange(display_name);
+							}}
+						/>
+						<OSMMap
+							center={mapCenter}
+							onSelect={({ lat, lng, display_name }) => {
+								setMapCenter({ lat, lng });
+								setValue("lat", lat);
+								setValue("lng", lng);
+								setValue("address", display_name);
+								onChange(display_name);
+							}}
+						/>
+						</>
+					)}
+					/>
 
-			<ProductList
-				cart={cart}
-				removeProduct={removeFlowerFromCart}
-				onDecrease={(productId) => updateCount(productId, "dec")}
-				onIncrease={(productId) => updateCount(productId, "inc")}
-			/>
+					<Button fullWidth type="submit" variant="contained" color="primary" size="large" style={{ borderRadius: "12px" }}>
+					Submit
+					</Button>
+				</form>
+				</CardContent>
+			</Card>
+			</Col>
+		</Row>
+
+		<ProductList
+			cart={cart}
+			removeProduct={removeFlowerFromCart}
+			onDecrease={(id) => updateCount(id, "dec")}
+			onIncrease={(id) => updateCount(id, "inc")}
+		/>
 		</Container>
 	);
 };
